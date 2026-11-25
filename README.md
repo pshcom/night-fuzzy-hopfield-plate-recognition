@@ -113,6 +113,13 @@ cd night-fuzzy-hopfield-plate-recognition
 pip install -r requirements.txt
 ```
 
+**바로 실행해 보기** (학습된 가중치와 샘플 사진이 포함되어 있어 clone 후 바로 동작합니다)
+```bash
+python run.py sample/83보1804.jpg
+```
+결과 이미지는 `sample/result_83보1804.jpg.png`로 저장됩니다.
+
+**처음부터 재학습** (데이터셋 필요)
 ```bash
 # 1) 전처리: trainplate/, validplate/ → prep_train/, prep_valid/ (글자별 32×32 ±1 패턴 저장)
 python batch_preprocess.py
@@ -120,16 +127,12 @@ python batch_preprocess.py
 # 2) 학습·평가: 홉필드 가중치 생성 + 성능 요약 + 혼동 행렬 → hopfield_final/
 python hopfield_final.py
 
-# 3) 추론: 번호판 이미지 한 장 인식
-python run.py testplate/test1.jpg
-
-# 4) 일괄 추론 / 케이스 분석: testplate/ 전체
+# 3) testplate/ 전체 일괄 추론
 python run_batch.py
-python analyze_cases.py
 ```
 
-- 번호판 검출 가중치(`license_plate_detector.pt`)는 용량 문제로 저장소에 포함하지 않았습니다.
-- 학습·테스트 이미지는 차량번호 개인정보 보호를 위해 공개하지 않습니다. 직접 실행하려면 `trainplate/`, `validplate/`, `testplate/`에 `*_번호.jpg` 형식(예: `img001_12가3456.jpg`)으로 이미지를 넣어주세요.
+- 학습·테스트 데이터셋(야간 번호판 2,165장)은 차량번호 개인정보 보호를 위해 공개하지 않습니다. 재학습하려면 `trainplate/`, `validplate/`에 `*_번호.jpg` 형식(예: `img001_12가3456.jpg`)으로 이미지를 넣어주세요.
+- 결과 재현을 위해 난수 시드를 고정했습니다.
 - 시각화 폰트는 Windows 기본 폰트(Malgun Gothic)를 사용합니다.
 
 ### 폴더 구조
@@ -140,13 +143,12 @@ python analyze_cases.py
 ├── hopfield_network.py          # Hopfield: medoid 추출, Pseudo-inverse 학습, 비동기 복원, 분류
 ├── hopfield_final.py            # 학습 + Train/Valid 평가 + 혼동 행렬
 ├── run.py                       # 단일 이미지 추론·시각화
-├── run_batch.py                 # testplate/ 일괄 추론
-├── analyze_cases.py             # 베스트/워스트 케이스 분석 + 실패 원인 자동 진단
-├── visualize_preprocessing.py   # 전처리 단계별 시각화
-├── viz_core.py / viz_infer.py   # 학습용·추론용 전처리 시각화
-├── hopfield_final/              # 학습된 가중치(.npy), summary.txt, 결과 그래프
+├── run_batch.py                 # 일괄 추론
+├── license_plate_detector.pt    # YOLOv8 번호판 검출 가중치
+├── hopfield_final/              # 학습된 홉필드 가중치(.npy), summary.txt, 결과 그래프
+├── sample/                      # 테스트용 야간 번호판 샘플 4장
 ├── requirements.txt
-└── docs/images/
+└── docs/images/                 # README 이미지
 ```
 
 ## 7. 결과 및 오류 분석
